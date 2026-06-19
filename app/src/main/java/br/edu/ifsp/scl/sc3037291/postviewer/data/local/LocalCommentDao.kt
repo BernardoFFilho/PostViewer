@@ -11,6 +11,9 @@ interface LocalCommentDao {
     @Query("SELECT * FROM local_comments WHERE postId = :postId")
     fun getCommentsForPost(postId: Int): Flow<List<LocalComment>>
 
+    @Query("SELECT * FROM local_comments")
+    fun getAllComments(): Flow<List<LocalComment>>
+
     @Insert
     suspend fun insertComment(comment: LocalComment)
 }

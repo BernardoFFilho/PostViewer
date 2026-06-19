@@ -23,8 +23,12 @@ class PostListViewModel(application: Application) : AndroidViewModel(application
     private val _uiState = MutableStateFlow<PostListUiState>(PostListUiState.Loading)
     val uiState: StateFlow<PostListUiState> = _uiState
 
+    private var allApiPosts: List<Post> = emptyList()
+    private var localCommentsCounts: Map<Int, Int> = emptyMap()
+
     init {
         loadPosts()
+        observeLocalComments()
     }
 
 
@@ -33,11 +37,34 @@ class PostListViewModel(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             _uiState.value = PostListUiState.Loading
             try {
-                val posts = repository.getPosts()
-                _uiState.value = PostListUiState.Success(posts)
+                allApiPosts = repository.getPosts()
+                applyLocalCommentCounts()
+                updateSuccessState()
             } catch (e: Exception) {
                 _uiState.value = PostListUiState.Error(e.message ?: "Erro ao carregar posts")
             }
+        }
+    }
+
+    private fun observeLocalComments() {
+        viewModelScope.launch {
+            repository.getAllLocalComments().collect { localComments ->
+                localCommentsCounts = localComments.groupBy { it.postId }.mapValues { it.value.size }
+                applyLocalCommentCounts()
+                updateSuccessState()
+            }
+        }
+    }
+
+    private fun applyLocalCommentCounts() {
+        allApiPosts.forEach { post ->
+            post.localCommentsCount = localCommentsCounts[post.id] ?: 0
+        }
+    }
+
+    private fun updateSuccessState() {
+        if (allApiPosts.isNotEmpty()) {
+            _uiState.value = PostListUiState.Success(allApiPosts.map { it.copy() })
         }
     }
 }

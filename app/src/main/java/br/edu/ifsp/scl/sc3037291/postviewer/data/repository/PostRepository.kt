@@ -25,6 +25,11 @@ class PostRepository(private val database: AppDatabase) {
         return database.localCommentDao().getCommentsForPost(postId)
     }
 
+
+    fun getAllLocalComments(): Flow<List<LocalComment>> {
+        return database.localCommentDao().getAllComments()
+    }
+
     //salva um novo comentário local no banco de dados Room
     suspend fun insertLocalComment(comment: LocalComment) {
         database.localCommentDao().insertComment(comment)

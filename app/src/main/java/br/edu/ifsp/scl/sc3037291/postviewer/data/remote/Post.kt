@@ -6,5 +6,7 @@ data class Post(
     @SerializedName("id") val id: Int,
     @SerializedName("userId") val userId: Int,
     @SerializedName("title") val title: String,
-    @SerializedName("body") val body: String
+    @SerializedName("body") val body: String,
+    @SerializedName("comments") val comments: List<ApiComment>? = null,
+    var localCommentsCount: Int = 0
 )

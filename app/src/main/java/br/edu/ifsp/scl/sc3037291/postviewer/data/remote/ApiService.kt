@@ -5,8 +5,7 @@ import retrofit2.http.Path
 
 interface ApiService {
 
-    //busca a lista completa de posts do endpoint GET /posts
-    @GET("posts")
+    @GET("posts?_embed=comments")
     suspend fun getPosts(): List<Post>
 
     //busca os comentários de um post específico pelo ID
